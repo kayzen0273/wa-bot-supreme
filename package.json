@@ -12,7 +12,8 @@
     "qrcode": "^1.5.3",
     "pino": "^8.17.2",
     "@hapi/boom": "^10.0.1",
-    "@supabase/supabase-js": "^2.38.0"
+    "@supabase/supabase-js": "^2.38.0",
+    "ws": "^8.14.2"
   },
   "engines": {
     "node": "20.x"
