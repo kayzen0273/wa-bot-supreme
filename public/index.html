@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💀 WA SUPREME BOT 💀</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a0a;
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.2em;
+            text-shadow: 0 0 30px #00ff41;
+            margin-bottom: 10px;
+            word-break: break-word;
+        }
+        .status {
+            display: inline-block;
+            padding: 10px 25px;
+            border: 2px solid;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .status.connected {
+            border-color: #00ff41;
+            color: #00ff41;
+            background: rgba(0,255,65,0.1);
+        }
+        .status.disconnected {
+            border-color: #ff0044;
+            color: #ff0044;
+            background: rgba(255,0,68,0.1);
+        }
+        .panel {
+            background: rgba(0,255,65,0.03);
+            border: 2px solid #00ff41;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .panel h2 {
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 12px 20px;
+            border: 2px solid #00ff41;
+            background: transparent;
+            color: #00ff41;
+            cursor: pointer;
+            font-family: monospace;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 120px;
+        }
+        .tab.active {
+            background: #00ff41;
+            color: #0a0a0a;
+        }
+        .tab:hover {
+            background: rgba(0,255,65,0.2);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        #qr-container {
+            text-align: center;
+            padding: 10px;
+        }
+        #qr-container p {
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        #qr-image {
+            max-width: 100%;
+            width: 280px;
+            height: auto;
+            border: 3px solid #00ff41;
+            padding: 10px;
+            background: white;
+            display: none;
+            margin: 0 auto;
+        }
+        #qr-waiting {
+            padding: 40px 20px;
+            border: 2px dashed #00ff41;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        .pairing-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .pairing-form input {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            background: #0a0a0a;
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            font-family: monospace;
+            font-size: 1em;
+            outline: none;
+        }
+        .pairing-form input:focus {
+            box-shadow: 0 0 15px #00ff41;
+        }
+        .pairing-form button {
+            padding: 15px 25px;
+            background: #00ff41;
+            color: #0a0a0a;
+            border: none;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .pairing-form button:hover {
+            box-shadow: 0 0 20px #00ff41;
+            transform: scale(1.02);
+        }
+        .pairing-form button:active {
+            transform: scale(0.98);
+        }
+        #pairing-code {
+            text-align: center;
+            padding: 25px 15px;
+            font-size: 2em;
+            font-weight: bold;
+            letter-spacing: 8px;
+            text-shadow: 0 0 20px #00ff41;
+            margin: 20px 0;
+            background: rgba(0,255,65,0.1);
+            border: 2px solid #00ff41;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+        #view-once-log {
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 0.85em;
+        }
+        .log-entry {
+            padding: 12px;
+            border-bottom: 1px solid rgba(0,255,65,0.2);
+            word-break: break-word;
+        }
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        .log-entry .time {
+            opacity: 0.6;
+            font-size: 0.8em;
+            margin-bottom: 5px;
+        }
+        .log-entry .filename {
+            color: #00ff41;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        .log-entry .info {
+            opacity: 0.8;
+        }
+        .placeholder {
+            opacity: 0.5;
+            text-align: center;
+            padding: 20px;
+        }
+        #view-once-log::-webkit-scrollbar {
+            width: 8px;
+        }
+        #view-once-log::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        #view-once-log::-webkit-scrollbar-thumb {
+            background: #00ff41;
+            border-radius: 4px;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: #00ff41;
+            color: #0a0a0a;
+            font-weight: bold;
+            border-radius: 5px;
+            box-shadow: 0 0 20px #00ff41;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            z-index: 1000;
+            max-width: 300px;
+        }
+        .notification.show {
+            transform: translateX(0);
+        }
+        .notification.error {
+            background: #ff0044;
+            color: white;
+            box-shadow: 0 0 20px #ff0044;
+        }
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.5em; }
+            .panel { padding: 15px; }
+            #pairing-code { font-size: 1.5em; letter-spacing: 4px; }
+            .tab { font-size: 0.8em; padding: 10px 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💀 WA SUPREME BOT 💀</h1>
+            <div id="status" class="status disconnected">DISCONNECTED</div>
+        </div>
+
+        <!-- LOGIN PANEL -->
+        <div class="panel" id="login-panel">
+            <h2>🔐 LOGIN WHATSAPP</h2>
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('qr')">📱 QR CODE</button>
+                <button class="tab" onclick="switchTab('pairing')">🔑 PAIRING CODE</button>
+            </div>
+
+            <!-- QR Tab -->
+            <div id="qr-tab" class="tab-content active">
+                <div id="qr-container">
+                    <p>Scan QR code ini dengan WhatsApp di HP lu:</p>
+                    <img id="qr-image" src="" alt="QR Code">
+                    <p id="qr-waiting">⏳ Menunggu QR code...</p>
+                </div>
+            </div>
+
+            <!-- Pairing Tab -->
+            <div id="pairing-tab" class="tab-content">
+                <p style="margin-bottom: 15px; font-size: 0.9em;">
+                    Masukin nomor HP lu (contoh: <b>6281234567890</b>), tanpa +, tanpa 0 depan.
+                </p>
+                <div class="pairing-form">
+                    <input type="tel" id="phone-number" placeholder="628xxxxxxxxxx" inputmode="numeric" />
+                    <button onclick="requestPairing()">🔑 Minta Kode</button>
+                </div>
+                <div id="pairing-code-display" style="display:none;">
+                    <p style="margin-top: 20px; font-size: 0.9em;">
+                        Masukkan kode ini di WhatsApp → Linked Devices → Link with phone number:
+                    </p>
+                    <div id="pairing-code">----</div>
+                    <p style="font-size: 0.8em; opacity: 0.7;">
+                        ⚠️ Kode expired dalam 1 menit. Kalau gagal, minta lagi.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW ONCE LOG -->
+        <div class="panel">
+            <h2>👁️ VIEW ONCE PERMANENT LOG</h2>
+            <div id="view-once-log">
+                <p class="placeholder">Belum ada media yang diamankan...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        const socket = io();
+        let currentQR = null;
+
+        // ============ SOCKET EVENTS ============
+        socket.on('connect', () => {
+            console.log('🔌 Connected to server');
+            showNotification('Terhubung ke server', 'success');
+        });
+
+        socket.on('disconnect', () => {
+            console.log('❌ Disconnected from server');
+            showNotification('Koneksi ke server terputus', 'error');
+        });
+
+        socket.on('status', (data) => {
+            const statusEl = document.getElementById('status');
+            if (data.connected) {
+                statusEl.textContent = 'CONNECTED ✅';
+                statusEl.className = 'status connected';
+                document.getElementById('login-panel').style.display = 'none';
+                showNotification('Bot WhatsApp terhubung!', 'success');
+            } else {
+                statusEl.textContent = 'DISCONNECTED ❌';
+                statusEl.className = 'status disconnected';
+                document.getElementById('login-panel').style.display = 'block';
+            }
+        });
+
+        socket.on('qr_updated', (data) => {
+            const img = document.getElementById('qr-image');
+            const waiting = document.getElementById('qr-waiting');
+            img.src = data.qr;
+            img.style.display = 'block';
+            waiting.style.display = 'none';
+            currentQR = data.qr;
+            console.log('📱 QR Updated');
+        });
+
+        socket.on('pairing_code', (data) => {
+            document.getElementById('pairing-code-display').style.display = 'block';
+            document.getElementById('pairing-code').textContent = data.code;
+            showNotification('Pairing code berhasil dibuat!', 'success');
+        });
+
+        socket.on('view_once_saved', (data) => {
+            const log = document.getElementById('view-once-log');
+            const placeholder = log.querySelector('.placeholder');
+            if (placeholder) placeholder.remove();
+
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <div class="time">${new Date(data.timestamp).toLocaleString('id-ID')}</div>
+                <div class="filename">💾 ${escapeHtml(data.filename)}</div>
+                <div class="info">📤 Dari: ${escapeHtml(data.from)}</div>
+                <div class="info">📦 Size: ${(data.size / 1024).toFixed(2)} KB</div>
+            `;
+            log.prepend(entry);
+            showNotification('View once diamankan!', 'success');
+        });
+
+        // ============ TAB SWITCHING ============
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'qr') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('qr-tab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('pairing-tab').classList.add('active');
+            }
+        }
+
+        // ============ PAIRING CODE ============
+        async function requestPairing() {
+            const phone = document.getElementById('phone-number').value.trim();
+            if (!phone) {
+                showNotification('Masukin nomor HP dulu GOBLOK!', 'error');
+                return;
+            }
+
+            // Validasi format
+            const cleanPhone = phone.replace(/\D/g, '');
+            if (cleanPhone.length < 10 || cleanPhone.length > 15) {
+                showNotification('Nomor HP gak valid!', 'error');
+                return;
+            }
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Loading...';
+
+            try {
+                const res = await fetch('/pairing', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phoneNumber: cleanPhone })
+                });
+                const data = await res.json();
+                
+                if (data.error) {
+                    showNotification('Error: ' + data.error, 'error');
+                } else {
+                    showNotification('Kode berhasil dibuat!', 'success');
+                }
+            } catch (err) {
+                showNotification('Gagal minta pairing code: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔑 Minta Kode';
+            }
+        }
+
+        // Enter key di input nomor
+        document.getElementById('phone-number').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') requestPairing();
+        });
+
+        // ============ NOTIFICATION ============
+        let notifTimeout;
+        function showNotification(msg, type = 'success') {
+            const notif = document.getElementById('notification');
+            notif.textContent = msg;
+            notif.className = 'notification ' + (type === 'error' ? 'error' : '');
+            
+            setTimeout(() => notif.classList.add('show'), 10);
+            
+            clearTimeout(notifTimeout);
+            notifTimeout = setTimeout(() => {
+                notif.classList.remove('show');
+            }, 3000);
+        }
+
+        // ============ ESCAPE HTML ============
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============ LOAD INITIAL STATUS ============
+        fetch('/status')
+            .then(r => r.json())
+            .then(data => {
+                const statusEl = document.getElementById('status');
+                if (data.connected) {
+                    statusEl.textContent = 'CONNECTED ✅';
+                    statusEl.className = 'status connected';
+                    document.getElementById('login-panel').style.display = 'none';
+                } else {
+                    statusEl.textContent = 'DISCONNECTED ❌';
+                    statusEl.className = 'status disconnected';
+                }
+            })
+            .catch(err => console.log('Status fetch error:', err));
+
+        console.log('🚀 Dashboard loaded!');
+    </script>
+</body>
+</html>
