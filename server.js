@@ -1,3 +1,5 @@
+global.crypto = require('crypto');
+
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -43,12 +45,11 @@ let reconnectAttempts = 0;
 
 const logger = pino({ level: 'silent' });
 
-// ============ SUPABASE AUTH STATE (FIXED) ============
+// ============ SUPABASE AUTH STATE ============
 async function useSupabaseAuthState(sessionId = 'default') {
     let creds = null;
     let keys = {};
 
-    // Load existing session
     try {
         const { data, error } = await supabase
             .from('whatsapp_sessions')
@@ -67,7 +68,6 @@ async function useSupabaseAuthState(sessionId = 'default') {
         console.log('ℹ️ Error loading session:', err.message);
     }
 
-    // Kalo creds kosong, bikin baru pake initAuthCreds
     if (!creds) {
         creds = initAuthCreds();
         console.log('🔑 New creds initialized');
@@ -139,7 +139,7 @@ app.post('/pairing', async (req, res) => {
     if (!phoneNumber) return res.status(400).json({ error: 'Nomor wajib diisi!' });
 
     try {
-        if (!sock) return res.status(500).json({ error: 'Bot belum siap' });
+        if (!sock) return res.status(500).json({ error: 'Bot belum siap, tunggu bentar' });
         const cleanNumber = phoneNumber.replace(/\D/g, '');
         const code = await sock.requestPairingCode(cleanNumber);
         pairingCode = code;
