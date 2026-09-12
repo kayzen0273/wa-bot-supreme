@@ -32,7 +32,11 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
     process.exit(1);
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+// MATIIN REALTIME BIAR GAK BUTUH 'ws'
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    realtime: { params: { eventsPerSecond: 0 } }
+});
 
 const MEDIA_DIR = './view_once_permanent';
 if (!fs.existsSync(MEDIA_DIR)) fs.mkdirSync(MEDIA_DIR, { recursive: true });
@@ -195,7 +199,8 @@ async function connectToWhatsApp() {
 
                 if (shouldReconnect && reconnectAttempts < 10) {
                     reconnectAttempts++;
-                    const delay = Math.min(5000 * reconnectAttempts, 30000);
+                    const delay = Math.min(10000 * reconnectAttempts, 60000);
+                    console.log(`🔄 Reconnecting in ${delay/1000}s...`);
                     setTimeout(connectToWhatsApp, delay);
                 }
             } else if (connection === 'open') {
@@ -265,6 +270,7 @@ async function connectToWhatsApp() {
 // ============ START ============
 server.listen(PORT, () => {
     console.log(`🚀 Bot running on port ${PORT}`);
+    console.log(`📡 Supabase: ${SUPABASE_URL ? 'Connected' : 'NOT CONFIGURED!'}`);
     connectToWhatsApp();
 });
 
