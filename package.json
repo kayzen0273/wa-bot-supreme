@@ -1,18 +1,15 @@
 {
-  "name": "wa-rvo-bot",
+  "name": "warungin-bot",
   "version": "1.0.0",
+  "description": "Bot WhatsApp interaktif untuk menu & order warung",
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.9",
-    "express": "^4.21.0",
-    "qrcode": "^1.5.4",
-    "pino": "^9.0.0",
-    "ws": "^8.18.0",
-    "wa-sticker-kit": "^1.0.1",
-    "@silent-tech-offc/ttdl": "^1.0.0",
-    "ultra-igdl": "^1.0.0"
+    "@hapi/boom": "^10.0.1",
+    "@supabase/supabase-js": "^2.45.4",
+    "pino": "^9.4.0"
   }
 }
