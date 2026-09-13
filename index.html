@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Warungin — Warung buka 24 jam lewat WhatsApp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#132A20;
+    --ink-2:#1B392C;
+    --paper:#EFF3EA;
+    --paper-2:#E4EADB;
+    --accent:#E8632C;
+    --accent-dim:#F4A47E;
+    --green:#2F6B4F;
+    --text-dark:#16241C;
+    --text-soft:#4B5C50;
+    --text-light:#F7F5EC;
+    --line:rgba(20,40,30,0.14);
+    --ok:#3E8E5C;
+    --wait:#C98A2A;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--text-dark);
+    font-family:'Plus Jakarta Sans', sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  a{color:inherit;}
+  .page{display:none;}
+  .page.active{display:block;}
+
+  /* ============ LANDING ============ */
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px;}
+
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(239,243,234,0.88);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;}
+  .logo{font-family:'Fraunces',serif;font-size:1.35rem;font-weight:600;display:flex;align-items:center;gap:8px;}
+  .logo-dot{width:9px;height:9px;border-radius:50%;background:var(--accent);display:inline-block;}
+  .nav-links{display:flex;gap:32px;font-size:0.95rem;color:var(--text-soft);}
+  .nav-links a{text-decoration:none;transition:color .15s;cursor:pointer;}
+  .nav-links a:hover{color:var(--text-dark);}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 22px;border-radius:8px;font-size:0.95rem;font-weight:600;
+    text-decoration:none;border:none;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-primary{background:var(--accent);color:var(--text-light);}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(232,99,44,0.35);}
+  .btn-ghost{background:transparent;color:var(--text-dark);border:1px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--text-dark);}
+
+  header.hero{padding:88px 0 72px;}
+  .hero-grid{display:grid;grid-template-columns:1.05fr 0.95fr;gap:56px;align-items:center;}
+  .eyebrow{color:var(--green);font-weight:600;font-size:0.9rem;margin-bottom:18px;}
+  .hero h1{font-size:3.1rem;line-height:1.08;max-width:11ch;}
+  .hero p.lead{margin-top:22px;font-size:1.15rem;color:var(--text-soft);max-width:42ch;}
+  .hero-cta{display:flex;gap:14px;margin-top:34px;}
+
+  .phone{
+    background:var(--ink);border-radius:34px;padding:14px;
+    box-shadow:0 30px 60px -20px rgba(19,42,32,0.45);
+    max-width:340px;margin:0 auto;
+  }
+  .phone-screen{
+    background:#E9E4D6;border-radius:22px;overflow:hidden;
+    min-height:480px;display:flex;flex-direction:column;
+  }
+  .phone-bar{
+    background:var(--green);color:var(--text-light);padding:14px 16px;
+    display:flex;align-items:center;gap:10px;font-size:0.9rem;font-weight:600;
+  }
+  .phone-bar .avatar{width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:0.85rem;}
+  .phone-body{flex:1;padding:14px;display:flex;flex-direction:column;gap:10px;font-size:0.82rem;}
+  .bubble{max-width:80%;padding:9px 12px;border-radius:12px;white-space:pre-line;}
+  .bubble.in{background:#fff;align-self:flex-start;border-bottom-left-radius:3px;}
+  .bubble.out{background:#D9F2C4;align-self:flex-end;border-bottom-right-radius:3px;}
+  .phone-time{font-size:0.68rem;color:var(--text-soft);text-align:center;margin:2px 0;}
+
+  .stats{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:36px 0;}
+  .stats .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .stat b{font-family:'Fraunces',serif;font-size:2.1rem;font-weight:500;display:block;}
+  .stat span{color:var(--text-soft);font-size:0.9rem;}
+
+  .section{padding:96px 0;}
+  .section-head{max-width:560px;margin-bottom:52px;}
+  .section-head h2{font-size:2.1rem;}
+  .section-head p{color:var(--text-soft);margin-top:12px;font-size:1.02rem;}
+
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:36px;}
+  .step{border-top:1px solid var(--line);padding-top:20px;}
+  .step .num{font-family:'Fraunces',serif;font-size:1.6rem;color:var(--accent);}
+  .step h3{font-size:1.15rem;margin-top:10px;}
+  .step p{color:var(--text-soft);margin-top:8px;font-size:0.95rem;}
+
+  .features{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);}
+  .feature{background:var(--paper);padding:30px;}
+  .feature svg{width:26px;height:26px;stroke:var(--green);}
+  .feature h3{font-size:1.05rem;margin-top:16px;}
+  .feature p{color:var(--text-soft);margin-top:8px;font-size:0.9rem;}
+
+  .demo{background:var(--ink);border-radius:20px;padding:56px;color:var(--text-light);display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;}
+  .demo h2{color:var(--text-light);font-size:1.9rem;max-width:14ch;}
+  .demo p{color:#C7D2C6;margin-top:16px;max-width:38ch;}
+  .demo-chat{background:#0E1F17;border-radius:14px;padding:20px;font-size:0.85rem;display:flex;flex-direction:column;gap:10px;}
+  .demo-chat .bubble.in{background:#1E3A2C;color:var(--text-light);}
+  .demo-chat .bubble.out{background:var(--accent);color:var(--text-light);}
+
+  .pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .plan{padding:32px;border:1px solid var(--line);}
+  .plan.featured{border:2px solid var(--accent);background:var(--paper-2);position:relative;}
+  .plan.featured::before{
+    content:"Paling dipilih";position:absolute;top:-13px;left:32px;
+    background:var(--accent);color:var(--text-light);font-size:0.72rem;font-weight:700;
+    padding:4px 10px;border-radius:5px;
+  }
+  .plan h3{font-size:1.1rem;}
+  .plan .price{font-family:'Fraunces',serif;font-size:2.2rem;margin:14px 0 4px;}
+  .plan .price small{font-family:'Plus Jakarta Sans';font-size:0.9rem;color:var(--text-soft);font-weight:400;}
+  .plan ul{list-style:none;padding:0;margin:22px 0 26px;display:flex;flex-direction:column;gap:10px;font-size:0.92rem;color:var(--text-soft);}
+  .plan ul li::before{content:"—";color:var(--green);margin-right:8px;}
+  .plan .btn{width:100%;}
+
+  .banner{background:var(--green);color:var(--text-light);border-radius:20px;padding:64px;display:flex;align-items:center;justify-content:space-between;gap:24px;}
+  .banner h2{color:var(--text-light);font-size:2rem;max-width:16ch;}
+  .banner .btn-primary{background:var(--accent);}
+
+  footer{padding:56px 0;border-top:1px solid var(--line);}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center;color:var(--text-soft);font-size:0.9rem;}
+
+  @media (max-width:860px){
+    .hero-grid,.demo,.steps,.pricing,.stats .wrap{grid-template-columns:1fr;}
+    .features{grid-template-columns:1fr;}
+    .nav-links{display:none;}
+    .hero h1{font-size:2.3rem;}
+    .banner{flex-direction:column;text-align:center;}
+  }
+
+  /* ============ DASHBOARD ============ */
+  .app{display:grid;grid-template-columns:250px 1fr;min-height:100vh;}
+
+  .sidebar{background:var(--ink);color:var(--text-light);padding:24px 18px;display:flex;flex-direction:column;}
+  .brand{display:flex;align-items:center;gap:8px;font-family:'Fraunces',serif;font-size:1.2rem;font-weight:600;padding:0 8px 28px;}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);}
+  .navlist{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:2px;}
+  .navlist li a{
+    display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:8px;
+    color:#C7D2C6;text-decoration:none;font-size:0.92rem;cursor:pointer;transition:background .15s,color .15s;
+  }
+  .navlist li a svg{width:17px;height:17px;stroke:currentColor;flex-shrink:0;}
+  .navlist li a:hover{background:rgba(255,255,255,0.06);color:#fff;}
+  .navlist li a.active{background:var(--ink-2);color:#fff;}
+  .sidebar-foot{margin-top:auto;padding:14px 12px;border-top:1px solid rgba(255,255,255,0.1);}
+  .status-row{display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#C7D2C6;}
+  .pulse{width:8px;height:8px;border-radius:50%;background:#57D18C;box-shadow:0 0 0 rgba(87,209,140,0.5);animation:pulse 2s infinite;}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(87,209,140,0.5);}
+    70%{box-shadow:0 0 0 8px rgba(87,209,140,0);}
+    100%{box-shadow:0 0 0 0 rgba(87,209,140,0);}
+  }
+  .sidebar-foot .num{font-size:0.8rem;color:#8FA095;margin-top:4px;}
+  .sidebar-foot .back-link{font-size:0.8rem;color:#C7D2C6;text-decoration:none;display:block;margin-top:10px;cursor:pointer;}
+  .sidebar-foot .back-link:hover{color:#fff;}
+
+  main{padding:32px 40px;max-width:1100px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;}
+  .topbar h1{font-size:1.6rem;}
+  .topbar p{color:var(--text-soft);margin-top:4px;font-size:0.92rem;}
+  .search{
+    background:var(--paper-2);border:1px solid var(--line);border-radius:8px;
+    padding:9px 14px;font-size:0.88rem;color:var(--text-soft);width:220px;
+  }
+
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px;}
+  .stat-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:20px;}
+  .stat-card .label{font-size:0.82rem;color:var(--text-soft);}
+  .stat-card .value{font-family:'Fraunces',serif;font-size:1.7rem;margin-top:6px;}
+  .stat-card .delta{font-size:0.78rem;color:var(--ok);margin-top:4px;}
+
+  .panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:24px;margin-bottom:24px;}
+  .panel h3{font-size:1.02rem;margin-bottom:18px;}
+  .bars{display:flex;align-items:flex-end;gap:8px;height:120px;}
+  .bar{flex:1;background:var(--paper-2);border-radius:4px 4px 0 0;position:relative;}
+  .bar-label{display:flex;gap:8px;margin-top:8px;}
+  .bar-label span{flex:1;text-align:center;font-size:0.68rem;color:var(--text-soft);}
+
+  table{width:100%;border-collapse:collapse;font-size:0.88rem;}
+  th{text-align:left;color:var(--text-soft);font-weight:600;font-size:0.78rem;padding:8px 10px;border-bottom:1px solid var(--line);}
+  td{padding:12px 10px;border-bottom:1px solid var(--line);}
+  tr:last-child td{border-bottom:none;}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;}
+  .badge.ok{background:#E1F1E5;color:var(--ok);}
+  .badge.wait{background:#FBEED9;color:var(--wait);}
+
+  .menu-item{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line);}
+  .menu-item:last-child{border-bottom:none;}
+  .menu-item .name{font-weight:600;}
+  .menu-item .price{color:var(--text-soft);font-size:0.88rem;margin-left:10px;}
+  .menu-item button{background:none;border:none;color:var(--text-soft);cursor:pointer;font-size:0.85rem;}
+  .menu-item button:hover{color:var(--accent);}
+  .add-row{display:flex;gap:10px;margin-top:18px;}
+  .add-row input{flex:1;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:0.88rem;}
+  .add-row button{
+    background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 18px;
+    font-weight:600;font-size:0.88rem;cursor:pointer;
+  }
+
+  .conv-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);align-items:center;}
+  .conv-item:last-child{border-bottom:none;}
+  .avatar{width:38px;height:38px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.9rem;flex-shrink:0;}
+  .conv-main{flex:1;min-width:0;}
+  .conv-main .name{font-weight:600;font-size:0.92rem;}
+  .conv-main .snippet{color:var(--text-soft);font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .conv-time{color:var(--text-soft);font-size:0.78rem;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<!-- ============ HALAMAN LANDING ============ -->
+<div class="page active" id="page-landing">
+  <nav>
+    <div class="wrap">
+      <div class="logo"><span class="logo-dot"></span>Warungin</div>
+      <div class="nav-links">
+        <a href="#fitur">Fitur</a>
+        <a href="#cara-kerja">Cara kerja</a>
+        <a href="#harga">Harga</a>
+      </div>
+      <a class="btn btn-primary" onclick="showPage('dashboard')">Coba dashboard</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">Bot WhatsApp untuk warung &amp; toko online</div>
+        <h1>Warung buka 24 jam, tanpa harus begadang.</h1>
+        <p class="lead">Warungin menjawab chat pelanggan, menampilkan menu, dan mencatat pesanan otomatis lewat WhatsApp — siang atau jam 2 pagi sekalipun.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" onclick="showPage('dashboard')">Coba gratis</a>
+          <a href="#cara-kerja" class="btn btn-ghost">Lihat cara kerjanya</a>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="phone-bar"><span class="avatar">W</span> Warung Ibu Sari</div>
+          <div class="phone-body">
+            <div class="bubble out">menu</div>
+            <div class="bubble in">Menu hari ini:
+1. Nasi Goreng — 18rb
+2. Mie Ayam — 15rb
+3. Es Teh — 5rb
+
+Balas dengan angka ya</div>
+            <div class="bubble out">1</div>
+            <div class="bubble in">Nasi Goreng x1 dicatat. Mau tambah minum?</div>
+            <div class="bubble out">3</div>
+            <div class="bubble in">Siap! Total 23rb. Kirim ke alamat mana?</div>
+            <div class="phone-time">02:14 — bot masih aktif</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="stats">
+    <div class="wrap">
+      <div class="stat"><b>24 jam</b><span>nonstop melayani chat</span></div>
+      <div class="stat"><b>&lt;2 detik</b><span>rata-rata waktu balas</span></div>
+      <div class="stat"><b>0</b><span>pesan pelanggan yang kelewat</span></div>
+    </div>
+  </section>
+
+  <section class="section" id="cara-kerja">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Cara kerja</h2>
+        <p>Tidak perlu install macam-macam. Tiga langkah dan bot langsung jalan.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="num">01</div>
+          <h3>Hubungkan nomor WhatsApp</h3>
+          <p>Scan kode QR sekali dari dashboard, nomor warungmu langsung terhubung ke bot.</p>
+        </div>
+        <div class="step">
+          <div class="num">02</div>
+          <h3>Susun menu &amp; alur tanya-jawab</h3>
+          <p>Atur daftar menu, harga, dan pertanyaan lanjutan (alamat, metode bayar) lewat dashboard.</p>
+        </div>
+        <div class="step">
+          <div class="num">03</div>
+          <h3>Bot melayani otomatis</h3>
+          <p>Pelanggan chat kapan saja, bot balas instan dan mencatat pesanan masuk ke dashboard.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="fitur" style="padding-top:0;">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Semua yang warung butuhkan</h2>
+        <p>Fokus ke jualan, biar bot yang jagain chat.</p>
+      </div>
+      <div class="features">
+        <div class="feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M4 5h16v11H7l-3 3V5z"/><path d="M8 9h8M8 12h5"/></svg>
+          <h3>Menu interaktif</h3>
+          <p>Pelanggan cukup balas angka untuk pilih menu, tanpa salah ketik.</p>
+        </div>
+        <div class="feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M4 4h16v4H4zM4 12h10v8H4zM17 12h3v8h-3z"/></svg>
+          <h3>Rekap pesanan otomatis</h3>
+          <p>Setiap order langsung masuk ke dashboard, rapi tanpa dicatat manual.</p>
+        </div>
+        <div class="feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
+          <h3>Aktif 24 jam</h3>
+          <p>Chat malam-malam pun tetap dijawab, tidak ada pelanggan yang menunggu.</p>
+        </div>
+        <div class="feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M12 3l2.5 5.5L20 9l-4.5 3.8L17 19l-5-3-5 3 1.5-6.2L4 9l5.5-.5z"/></svg>
+          <h3>Lompat ke admin manusia</h3>
+          <p>Kalau pelanggan butuh bantuan khusus, chat bisa dialihkan ke kamu langsung.</p>
+        </div>
+        <div class="feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M4 19h16M7 15v-6M12 15V5M17 15v-9"/></svg>
+          <h3>Statistik jam sibuk</h3>
+          <p>Lihat jam ramai dan menu terlaris untuk atur stok lebih tepat.</p>
+        </div>
+        <div class="feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg>
+          <h3>Riwayat percakapan</h3>
+          <p>Semua obrolan tersimpan, gampang dicari kalau ada komplain atau tanya ulang.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="demo">
+        <div>
+          <h2>Lihat contoh obrolan lengkapnya</h2>
+          <p>Dari buka menu sampai pesanan dikonfirmasi, semua tanpa kamu pegang HP.</p>
+        </div>
+        <div class="demo-chat">
+          <div class="bubble in">Halo, buka jam berapa ya?</div>
+          <div class="bubble out">Warung kami buka 24 jam via chat! Ketik "menu" untuk lihat pilihan 🙂</div>
+          <div class="bubble in">menu</div>
+          <div class="bubble out">1. Nasi Goreng - 18rb
+2. Mie Ayam - 15rb
+3. Es Teh - 5rb</div>
+          <div class="bubble in">2 sama 3</div>
+          <div class="bubble out">Mie Ayam + Es Teh, total 20rb. Alamat kirim ke mana?</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="harga">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Harga sesuai ukuran warung</h2>
+        <p>Mulai gratis, upgrade kalau order makin ramai.</p>
+      </div>
+      <div class="pricing">
+        <div class="plan">
+          <h3>Warung Kecil</h3>
+          <div class="price">Gratis</div>
+          <ul>
+            <li>1 nomor WhatsApp</li>
+            <li>Menu interaktif dasar</li>
+            <li>Sampai 100 chat/bulan</li>
+          </ul>
+          <a class="btn btn-ghost" onclick="showPage('dashboard')">Mulai gratis</a>
+        </div>
+        <div class="plan featured">
+          <h3>Warung Ramai</h3>
+          <div class="price">Rp99rb<small>/bulan</small></div>
+          <ul>
+            <li>1 nomor WhatsApp</li>
+            <li>Chat tanpa batas</li>
+            <li>Dashboard pesanan &amp; statistik</li>
+            <li>Alihkan ke admin manusia</li>
+          </ul>
+          <a class="btn btn-primary" onclick="showPage('dashboard')">Pilih paket ini</a>
+        </div>
+        <div class="plan">
+          <h3>Warung Grup</h3>
+          <div class="price">Rp299rb<small>/bulan</small></div>
+          <ul>
+            <li>Sampai 5 nomor/cabang</li>
+            <li>Semua fitur Warung Ramai</li>
+            <li>Laporan gabungan antar cabang</li>
+          </ul>
+          <a class="btn btn-ghost" onclick="showPage('dashboard')">Pilih paket ini</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="wrap">
+      <div class="banner">
+        <h2>Nomor WhatsApp warungmu siap jaga toko sendiri.</h2>
+        <a class="btn btn-primary" onclick="showPage('dashboard')">Mulai sekarang</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="logo"><span class="logo-dot"></span>Warungin</div>
+      <div>&copy; 2026 Warungin</div>
+    </div>
+  </footer>
+</div>
+
+<!-- ============ HALAMAN DASHBOARD ============ -->
+<div class="page" id="page-dashboard">
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><span class="dot"></span>Warungin</div>
+      <ul class="navlist">
+        <li><a data-view="ringkasan" class="active">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg>
+          Ringkasan</a></li>
+        <li><a data-view="percakapan">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M4 5h16v11H8l-4 3z"/></svg>
+          Percakapan</a></li>
+        <li><a data-view="menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M4 5h16M4 12h16M4 19h10"/></svg>
+          Menu bot</a></li>
+        <li><a data-view="pesanan">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="4" y="7" width="16" height="13" rx="1"/><path d="M8 7V5a4 4 0 018 0v2"/></svg>
+          Pesanan</a></li>
+      </ul>
+      <div class="sidebar-foot">
+        <div class="status-row"><span class="pulse"></span> Bot aktif</div>
+        <div class="num">+62 812-xxxx-xxxx</div>
+        <a class="back-link" onclick="showPage('landing')">← Kembali ke beranda</a>
+      </div>
+    </aside>
+
+    <main>
+      <section class="view active" id="view-ringkasan">
+        <div class="topbar">
+          <div>
+            <h1>Selamat datang kembali</h1>
+            <p>Ini yang terjadi di warungmu hari ini.</p>
+          </div>
+          <input class="search" placeholder="Cari percakapan atau pesanan...">
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-card"><div class="label">Pesan hari ini</div><div class="value">0</div><div class="delta">&nbsp;</div></div>
+          <div class="stat-card"><div class="label">Pesanan masuk</div><div class="value">0</div><div class="delta">&nbsp;</div></div>
+          <div class="stat-card"><div class="label">Pelanggan aktif</div><div class="value">0</div><div class="delta">7 hari terakhir</div></div>
+          <div class="stat-card"><div class="label">Waktu aktif bot</div><div class="value">24 jam</div><div class="delta">nonstop</div></div>
+        </div>
+
+        <div class="panel">
+          <h3>Pesan masuk per jam</h3>
+          <div class="bars" id="bars"></div>
+          <div class="bar-label">
+            <span>00</span><span>04</span><span>08</span><span>12</span><span>16</span><span>20</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Percakapan terbaru</h3>
+          <div id="conv-preview"></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-percakapan">
+        <div class="topbar"><div><h1>Percakapan</h1><p>Semua chat yang masuk lewat bot.</p></div></div>
+        <div class="panel" id="conv-full"></div>
+      </section>
+
+      <section class="view" id="view-menu">
+        <div class="topbar"><div><h1>Menu bot</h1><p>Daftar ini yang ditampilkan bot saat pelanggan ketik "menu".</p></div></div>
+        <div class="panel">
+          <div id="menu-list"></div>
+          <div class="add-row">
+            <input id="new-name" placeholder="Nama menu, mis. Nasi Uduk">
+            <input id="new-price" placeholder="Harga, mis. 12rb" style="max-width:120px;">
+            <button onclick="addMenu()">Tambah</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-pesanan">
+        <div class="topbar"><div><h1>Pesanan</h1><p>Order yang dicatat otomatis oleh bot.</p></div></div>
+        <div class="panel">
+          <table>
+            <thead><tr><th>ID</th><th>Pelanggan</th><th>Pesanan</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody id="orders-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  // ---- Ganti halaman landing <-> dashboard ----
+  function showPage(name){
+    document.getElementById('page-landing').classList.toggle('active', name==='landing');
+    document.getElementById('page-dashboard').classList.toggle('active', name==='dashboard');
+    window.scrollTo(0,0);
+  }
+
+  // ---- Koneksi Supabase ----
+  const SUPABASE_URL = 'https://zwqwomfrgtqyaiiugryg.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3cXdvbWZyZ3RxeWFpaXVncnlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMDUzODAsImV4cCI6MjEwNDc4MTM4MH0.Zs2egViPPVec5OeAUgCI0-nUG1ABCDi2fyhVTvHNmao';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ---- Nav switching di dalam dashboard ----
+  document.querySelectorAll('.navlist a').forEach(a=>{
+    a.addEventListener('click',()=>{
+      document.querySelectorAll('.navlist a').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      a.classList.add('active');
+      document.getElementById('view-'+a.dataset.view).classList.add('active');
+    });
+  });
+
+  // ---- Util ----
+  function initials(n){ if(!n) return '?'; return n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+  function waktuLalu(iso){
+    if(!iso) return '-';
+    const detik = Math.floor((Date.now() - new Date(iso).getTime())/1000);
+    if(detik < 60) return 'baru saja';
+    if(detik < 3600) return Math.floor(detik/60)+' mnt';
+    if(detik < 86400) return Math.floor(detik/3600)+' jam';
+    return Math.floor(detik/86400)+' hari';
+  }
+  function formatRb(angka){ return Math.round(angka/1000)+'rb'; }
+
+  function renderConv(target, list){
+    if(list.length === 0){ target.innerHTML = '<p style="color:var(--text-soft);font-size:0.9rem;">Belum ada percakapan masuk.</p>'; return; }
+    target.innerHTML = list.map(c=>`
+      <div class="conv-item">
+        <div class="avatar">${initials(c.nama || c.nomor)}</div>
+        <div class="conv-main">
+          <div class="name">${c.nama || c.nomor}</div>
+          <div class="snippet">${c.last_message || ''}</div>
+        </div>
+        <span class="badge ${c.status}">${c.status==='ok'?'Selesai':'Perlu admin'}</span>
+        <div class="conv-time">${waktuLalu(c.updated_at)}</div>
+      </div>`).join('');
+  }
+
+  function renderMenu(list){
+    document.getElementById('menu-list').innerHTML = list.map(m=>`
+      <div class="menu-item">
+        <div><span class="name">${m.nama}</span><span class="price">${formatRb(m.harga)}</span></div>
+        <button onclick="removeMenu(${m.id})">Hapus</button>
+      </div>`).join('');
+  }
+
+  function renderOrders(list){
+    document.getElementById('orders-body').innerHTML = list.map(o=>`
+      <tr>
+        <td>#${o.id}</td>
+        <td>${o.nama || o.nomor}</td>
+        <td>${(o.items||[]).map(i=>i.nama).join(', ')}</td>
+        <td>${formatRb(o.total)}</td>
+        <td><span class="badge ${o.status}">${o.status==='ok'?'Selesai':'Menunggu bayar'}</span></td>
+      </tr>`).join('') || '<tr><td colspan="5" style="color:var(--text-soft);">Belum ada pesanan.</td></tr>';
+  }
+
+  function renderBars(orders){
+    const perJam = new Array(24).fill(0);
+    orders.forEach(o=>{
+      const j = new Date(o.created_at).getHours();
+      perJam[j]++;
+    });
+    const bars = document.getElementById('bars');
+    const maxV = Math.max(1, ...perJam);
+    bars.innerHTML = '';
+    perJam.forEach(v=>{
+      const d = document.createElement('div');
+      d.className='bar';
+      d.style.height = (v/maxV*100)+'%';
+      bars.appendChild(d);
+    });
+  }
+
+  function updateStatCards({pesanHariIni, pesananMasuk, pelangganAktif}){
+    const cards = document.querySelectorAll('.stat-card .value');
+    cards[0].textContent = pesanHariIni;
+    cards[1].textContent = pesananMasuk;
+    cards[2].textContent = pelangganAktif;
+  }
+
+  async function muatSemuaData(){
+    const [{ data: menu, error: eMenu }, { data: conv, error: eConv }, { data: orders, error: eOrders }] =
+      await Promise.all([
+        sb.from('menu').select('*').order('urutan', { ascending: true }),
+        sb.from('conversations').select('*').order('updated_at', { ascending: false }),
+        sb.from('orders').select('*').order('created_at', { ascending: false }),
+      ]);
+
+    if (eMenu || eConv || eOrders) {
+      console.error('Gagal mengambil data dari Supabase:', eMenu || eConv || eOrders);
+    }
+
+    const menuList = menu || [];
+    const convList = conv || [];
+    const orderList = orders || [];
+
+    renderMenu(menuList);
+    renderConv(document.getElementById('conv-preview'), convList.slice(0,3));
+    renderConv(document.getElementById('conv-full'), convList);
+    renderOrders(orderList);
+    renderBars(orderList);
+
+    const hariIni = new Date().toDateString();
+    updateStatCards({
+      pesanHariIni: convList.filter(c => new Date(c.updated_at).toDateString() === hariIni).length,
+      pesananMasuk: orderList.filter(o => new Date(o.created_at).toDateString() === hariIni).length,
+      pelangganAktif: new Set(convList.map(c => c.nomor)).size,
+    });
+  }
+
+  async function addMenu(){
+    const nameEl = document.getElementById('new-name');
+    const priceEl = document.getElementById('new-price');
+    if(!nameEl.value.trim()) return;
+    const harga = parseInt(priceEl.value.replace(/[^0-9]/g,''), 10) || 0;
+    const { error } = await sb.from('menu').insert({ nama: nameEl.value.trim(), harga });
+    if(error){ alert('Gagal menambah menu: '+error.message); return; }
+    nameEl.value=''; priceEl.value='';
+    muatSemuaData();
+  }
+
+  async function removeMenu(id){
+    const { error } = await sb.from('menu').delete().eq('id', id);
+    if(error){ alert('Gagal menghapus menu: '+error.message); return; }
+    muatSemuaData();
+  }
+
+  muatSemuaData();
+  setInterval(muatSemuaData, 15000);
+</script>
+</body>
+</html>
